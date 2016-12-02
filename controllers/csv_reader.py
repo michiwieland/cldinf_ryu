@@ -9,7 +9,7 @@ class CSVReader:
         self.delimiter = delimiter
         self.filename = os.path.join(os.path.dirname(__file__), filename)
 
-    def read():
+    def read(self):
         with open(self.filename, 'rb') as csvfile:
             reader = csv.reader(csvfile, delimiter=self.delimiter)
             for row in reader:
