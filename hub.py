@@ -61,7 +61,7 @@ class Hub(app_manager.RyuApp):
         in_port = msg.match['in_port']
         self.logger.info("packet in %s %s %s %s", dpid, src, dst, in_port)
 
-        # flood
+        # flood on all ports
         out_port = ofproto.OFPP_FLOOD
 
         # construct action list.
