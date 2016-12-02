@@ -22,6 +22,9 @@ mininet> sh ovs-vsctl set bridge s1 protocols=OpenFlow13
 mininet> pingall
 ```
 
+![pingall](pingall_hub.png)
+
+
 ### Exercise 2: Ein (nicht ganz) dummer Hub mit geschriebenen Flows
 ```bash
 # Clear old topologies
@@ -40,7 +43,12 @@ mininet> sh ovs-vsctl set bridge s1 protocols=OpenFlow13
 
 ## Test connectivity
 mininet> pingall
+
+## Display Flows on Switch s1
+mininet> sh ovs-ofctl -O openflow13 dump-flows s1
 ```
+
+![pingall and flows](hub_flow.png)
 
 ### Exercise 3: Ein einfacher Switch
 Hinweis: unsere Switch implementation hat kein STP, d.h. es kann broadcast-storms geben.
@@ -62,7 +70,12 @@ mininet> sh ovs-vsctl set bridge s1 protocols=OpenFlow13
 
 ## Test connectivity
 mininet> pingall
+
+## Display Flows on Switch s1
+mininet> sh ovs-ofctl -O openflow13 dump-flows s1
 ```
+
+![pingall and flows](switch.png)
 
 ### Exercise 4: Ein Policy-Based controller
 ```bash
@@ -82,8 +95,13 @@ mininet> sh ovs-vsctl set bridge s1 protocols=OpenFlow13
 
 ## Test connectivity
 mininet> pingall
+
+## Display Flows on Switch s1
+mininet> sh ovs-ofctl -O openflow13 dump-flows s1
 ```
 
+![pingall](policy_pingall.png)
+![flows](policy_flows.png)
 
 # Basics
 - [First Application](https://ryu.readthedocs.io/en/latest/writing_ryu_app.html)
