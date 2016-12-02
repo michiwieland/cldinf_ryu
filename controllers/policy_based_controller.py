@@ -79,26 +79,30 @@ class PolicyBasedController(app_manager.RyuApp):
         policies = CSVReader().policies
         out_port = 0
 
-        if dst in policies[src]:
+        if (dst in policies[src]) or dst == 'ff:ff:ff:ff:ff:ff':
+            self.logger.info("packet is permitted")
             if dst in self.mac_to_port[dpid]:
                 out_port = self.mac_to_port[dpid][dst]
+                self.logger.info("packet is knowingly forwarded to port %s", out_port)
             else:
                 out_port = ofproto.OFPP_FLOOD
+                self.logger.info("packet is flooded.")
 
             actions = [parser.OFPActionOutput(out_port)]
+
+            # install a flow to avoid packet_in next time.
+            if out_port != ofproto.OFPP_FLOOD:
+                self.logger.info("installing flood...")
+                match = parser.OFPMatch(in_port=in_port, eth_dst=dst)
+                self.add_flow(datapath, 1, match, actions)
+
+            # construct packet_out message and send it.
+            out = parser.OFPPacketOut(
+                    datapath=datapath,
+                    buffer_id=ofproto.OFP_NO_BUFFER,
+                    in_port=in_port, actions=actions,
+                    data=msg.data)
+
+            datapath.send_msg(out)
         else:
-            actions = []
-
-        # install a flow to avoid packet_in next time.
-        if out_port != ofproto.OFPP_FLOOD:
-            match = parser.OFPMatch(in_port=in_port, eth_dst=dst)
-            self.add_flow(datapath, 1, match, actions)
-
-        # construct packet_out message and send it.
-        out = parser.OFPPacketOut(
-                datapath=datapath,
-                buffer_id=ofproto.OFP_NO_BUFFER,
-                in_port=in_port, actions=actions,
-                data=msg.data)
-
-        datapath.send_msg(out)
+            self.logger.info("packet has no policy.")
