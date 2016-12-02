@@ -77,14 +77,15 @@ class PolicyBasedController(app_manager.RyuApp):
 
         # read policies from csv file
         policies = CSVReader().policies
+        out_port = 0
 
         if dst in policies[src]:
-            actions = [parser.OFPActionOutput(out_port)]
-
             if dst in self.mac_to_port[dpid]:
                 out_port = self.mac_to_port[dpid][dst]
             else:
                 out_port = ofproto.OFPP_FLOOD
+
+            actions = [parser.OFPActionOutput(out_port)]
         else:
             actions = []
 
