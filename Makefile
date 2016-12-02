@@ -1,22 +1,39 @@
-.PHONY: all start stop attach excercise1 excercise2 excercise3
+#.PHONY: all start stop attach excercise1 excercise2 excercise3
 
 all: start excercise1 excercise2 excercise3 stop
 
+MN=docker exec --interactive --tty mininet
+RYU=docker exec --interactive --tty ryu
+RYUC=$(RYU) /root/lab/controller
+
 start:
-	docker-compose build
-	docker-compose start
+	@docker-compose build
+	@docker-compose create
+	@docker-compose start
 
 stop:
-	docker-compose stop
+	@docker-compose stop
 
 excercise1:
-	@docker exec --interactive --tty mini_net /root/mininet/excercise1.py
+	@$(RYUC) start ryu/app/simple_switch.py
+	@$(MN) mn --topo single,3 --mac --controller remote,ip=$$($(MN) dig +short ryu)
+	@$(MN) mn -c
+	@$(RYUC) stop
 
 excercise2:
-	@docker exec --interactive --tty mini_net /root/mininet/excercise2.py
+	@$(RYUC) start ryu/app/hub.py
+	@$(MN) /root/lab/networks/excercise2.py
+	@$(MN) mn -c
+	@$(RYUC) stop
 
 excercise3:
-	@docker exec --interactive --tty mini_net /root/mininet/excercise3.py
+	@$(RYUC) start ryu/app/hub.py
+	@$(MN) /root/lab/networks/excercise3.py
+	@$(MN) mn -c
+	@$(RYUC) stop
 
-attach:
-	@docker exec --interactive --tty mini_net /bin/bash
+attach-mininet:
+	@$(MN) /bin/bash
+
+attach-ryu:
+	@$(RYU) /bin/bash

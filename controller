@@ -1,0 +1,35 @@
+#!/bin/bash
+set -e
+
+LOGFILE="/var/log/ryu-manager"
+
+usage() {
+	echo "Usage: $0 (start <controller>|stop)" >&2
+	exit 255
+}
+
+
+if [ "$1" == "start" ]; then
+	if [ "$2" == "" ]; then
+		usage
+	fi
+
+	if pgrep ryu-manager>/dev/null; then pgrep ryu-manager | xargs kill; fi
+	nohup ryu-manager --verbose $3 >> ${LOGFILE} &
+
+	sleep 2
+	echo "ryu-manager started; logging to ${LOGFILE}"
+	exit 0
+fi
+
+if [ "$1" == "stop" ]; then
+	if pgrep ryu-manager>/dev/null; then pgrep ryu-manager | xargs kill; fi
+
+	sleep 1
+	if pgrep ryu-manager>/dev/null; then pgrep ryu-manager | xargs kill -9 ; fi
+
+	echo "Killed all ryu-manager instances."
+	exit 0
+fi
+
+usage

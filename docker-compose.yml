@@ -5,7 +5,11 @@ services:
     image: hsrnetwork/ryu
     restart: always
     volumes:
-      - ./:/opt/ryu/ryu/app/my/
+      - ./:/root/lab/
+        #      - ./controller/:/opt/ryu/ryu/app/
+    command: /bin/bash
+    stdin_open: true
+    tty: true
   mininet:
     container_name: mininet
     links:
@@ -16,8 +20,7 @@ services:
     restart: on-failure:3
     privileged: true
     volumes:
-      - ./:/root/mininet/
-    command: /bin/bash
+      - ./:/root/lab/
     stdin_open: true
     tty: true
 
