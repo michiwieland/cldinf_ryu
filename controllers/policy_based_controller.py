@@ -76,14 +76,16 @@ class PolicyBasedController(app_manager.RyuApp):
         self.mac_to_port[dpid][src] = in_port
 
         # read policies from csv file
-        policies = CSVReader().policies
+        policies = CSVReader().read()
         out_port = 0
 
         if (dst in policies[src]) or dst == 'ff:ff:ff:ff:ff:ff':
             self.logger.info("packet is permitted")
             if dst in self.mac_to_port[dpid]:
                 out_port = self.mac_to_port[dpid][dst]
-                self.logger.info("packet is knowingly forwarded to port %s", out_port)
+                self.logger.info(
+                    "packet is knowingly forwarded to port %s",
+                    out_port)
             else:
                 out_port = ofproto.OFPP_FLOOD
                 self.logger.info("packet is flooded.")
