@@ -78,12 +78,13 @@ class PolicyBasedController(app_manager.RyuApp):
         # read policies from csv file
         policies = CSVReader.read()
 
-        # if the destination mac address is already learned
-        # and does not policy
-        if dst in policies[src] and dst in self.mac_to_port[dpid]:
-            out_port = self.mac_to_port[dpid][dst]
+        if dst in policies[src]:
+            if dst in self.mac_to_port[dpid]:
+                out_port = self.mac_to_port[dpid][dst]
+            else:
+                out_port = ofproto.OFPP_FLOOD
         else:
-            out_port = ofproto.OFPP_FLOOD
+            action = []
 
         # install a flow to avoid packet_in next time.
         if out_port != ofproto.OFPP_FLOOD:
