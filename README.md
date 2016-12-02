@@ -1,12 +1,88 @@
 # CldInf Prak Ryu
 
-# Installation
-1. `make`
+## Exercises
 
-## Mininet
-1. `sudo mn -c`
-2. `sudo mn --topo single,6 --mac --controller remote,ip=127.0.0.1`
+### Exercise 1: Ein dummer Hub
+```bash
+# Clear old topologies
+mn -c
 
+# Execute controller:
+docker run -ti -p 6633:6633 -v `pwd`/controllers:/opt/ryu/ryu/app/my/ hsrnetwork/ryu ryu-manager --verbose ryu/app/my/hub.py
+```
+
+```bash
+# Create new topology
+mn --topo single,3 --mac --controller remote
+
+## Set OVSwitch to OpenFlow13
+mininet> sh ovs-vsctl set bridge s1 protocols=OpenFlow13
+
+## Test connectivity
+mininet> pingall
+```
+
+### Exercise 2: Ein (nicht ganz) dummer Hub mit geschriebenen Flows
+```bash
+# Clear old topologies
+mn -c
+
+# Execute controller
+docker run -ti -p 6633:6633 -v `pwd`/controllers:/opt/ryu/ryu/app/my/ hsrnetwork/ryu ryu-manager --verbose ryu/app/my/hub_flow.py
+```
+
+```bash
+# Create new Topology
+mn --topo single,3 --mac --controller remote
+
+## Set OVSwitch to OpenFlow13
+mininet> sh ovs-vsctl set bridge s1 protocols=OpenFlow13
+
+## Test connectivity
+mininet> pingall
+```
+
+### Exercise 3: Ein einfacher Switch
+Hinweis: unsere Switch implementation hat kein STP, d.h. es kann broadcast-storms geben.
+
+```bash
+# Clear old topologies
+mn -c
+
+# Execute Controller:
+docker run -ti -p 6633:6633 -v `pwd`/controllers:/opt/ryu/ryu/app/my/ hsrnetwork/ryu ryu-manager --verbose ryu/app/my/switch.py
+```
+
+```bash
+# Create new Topology
+mn --topo single,3 --mac --controller remote
+
+## Set OVSwitch to OpenFlow13
+mininet> sh ovs-vsctl set bridge s1 protocols=OpenFlow13
+
+## Test connectivity
+mininet> pingall
+```
+
+### Exercise 4: Ein Policy-Based controller
+```bash
+# Clear old topologies
+mn -c
+
+# Execute Controller:
+docker run -ti -p 6633:6633 -v `pwd`/controllers:/opt/ryu/ryu/app/my/ hsrnetwork/ryu ryu-manager --verbose ryu/app/my/policy_based_controller.py
+```
+
+```bash
+# Create new Topology
+mn --topo single,6 --mac --controller remote
+
+## Set OVSwitch to OpenFlow13
+mininet> sh ovs-vsctl set bridge s1 protocols=OpenFlow13
+
+## Test connectivity
+mininet> pingall
+```
 
 
 # Basics
