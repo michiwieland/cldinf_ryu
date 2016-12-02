@@ -3,17 +3,11 @@
 # Installation
 1. `make`
 
-## Prerequisites
-1. `sudo apt-get update`
-2. `time sudo apt-get install python-eventlet python-routes python-webob python-paramiko`
-
 ## Mininet
 1. `sudo mn -c`
-2. `sudo mn --topo single, 3 --mac --switch ovsk --controller remote`
+2. `sudo mn --topo single,6 --mac --controller remote,ip=127.0.0.1`
 
-## Ryu
-1. git clone https://github.com/michiwieland/cldinf_ryu.git
-2. `PYTHONPATH=. ./bin/ryu-manager --verbose ryu/app/simple_switch.py`
+
 
 # Basics
 - [First Application](https://ryu.readthedocs.io/en/latest/writing_ryu_app.html)
