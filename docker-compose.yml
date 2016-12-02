@@ -1,0 +1,23 @@
+version: '2'
+services:
+  ryu:
+    container_name: ryu
+    image: hsrnetwork/ryu
+    restart: always
+    volumes:
+      - ./:/opt/ryu/ryu/app/my/
+  mininet:
+    container_name: mininet
+    links:
+      - ryu
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: on-failure:3
+    privileged: true
+    volumes:
+      - ./:/root/mininet/
+    command: /bin/bash
+    stdin_open: true
+    tty: true
+
