@@ -6,7 +6,7 @@ from ryu.controller.handler import set_ev_cls
 from ryu.ofproto import ofproto_v1_3
 from ryu.lib.packet import packet
 from ryu.lib.packet import ethernet
-from util/csv_reader import CSVReader
+from csv_reader import CSVReader
 
 
 class PolicyBasedController(app_manager.RyuApp):
@@ -76,15 +76,17 @@ class PolicyBasedController(app_manager.RyuApp):
         self.mac_to_port[dpid][src] = in_port
 
         # read policies from csv file
-        policies = CSVReader.read()
+        policies = CSVReader().read()
 
         if dst in policies[src]:
+            actions = [parser.OFPActionOutput(out_port)]
+
             if dst in self.mac_to_port[dpid]:
                 out_port = self.mac_to_port[dpid][dst]
             else:
                 out_port = ofproto.OFPP_FLOOD
         else:
-            action = []
+            actions = []
 
         # install a flow to avoid packet_in next time.
         if out_port != ofproto.OFPP_FLOOD:
