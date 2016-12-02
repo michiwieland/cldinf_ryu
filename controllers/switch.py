@@ -8,11 +8,13 @@ from ryu.lib.packet import packet
 from ryu.lib.packet import ethernet
 
 
-class Hub(app_manager.RyuApp):
+class Switch(app_manager.RyuApp):
     OFP_VERSIONS = [ofproto_v1_3.OFP_VERSION]
 
     def __init__(self, *args, **kwargs):
-        super(Hub, self).__init__(*args, **kwargs)
+        super(Switch, self).__init__(*args, **kwargs)
+        # initialize mac address table.
+        self.mac_to_port = {}
 
     @set_ev_cls(ofp_event.EventOFPSwitchFeatures, CONFIG_DISPATCHER)
     def switch_features_handler(self, ev):
@@ -56,16 +58,33 @@ class Hub(app_manager.RyuApp):
 
         # get Datapath ID to identify OpenFlow switches.
         dpid = datapath.id
+        self.mac_to_port.setdefault(dpid, {})
+
+        # analyse the received packets using the packet library.
+        pkt = packet.Packet(msg.data)
+        eth_pkt = pkt.get_protocol(ethernet.ethernet)
+        dst = eth_pkt.dst
+        src = eth_pkt.src
 
         # get the received port number from packet_in message.
         in_port = msg.match['in_port']
         self.logger.info("packet in %s %s %s %s", dpid, src, dst, in_port)
 
-        # flood on all ports
-        out_port = ofproto.OFPP_FLOOD
+        # learn a mac address to avoid FLOOD next time.
+        self.mac_to_port[dpid][src] = in_port
 
+        # if the destination mac address is already learned,
+        # decide which port to output the packet, otherwise FLOOD
+        if dst in self.mac_to_port[dpid]:
+            out_port = self.mac_to_port[dpid][dst]
+        else:
+            out_port = ofproto.OFPP_FLOOD
         # construct action list.
         actions = [parser.OFPActionOutput(out_port)]
+        # install a flow to avoid packet_in next time.
+        if out_port != ofproto.OFPP_FLOOD:
+            match = parser.OFPMatch(in_port=in_port, eth_dst=dst)
+            self.add_flow(datapath, 1, match, actions)
 
         # construct packet_out message and send it.
         out = parser.OFPPacketOut(

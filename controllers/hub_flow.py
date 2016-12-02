@@ -8,11 +8,11 @@ from ryu.lib.packet import packet
 from ryu.lib.packet import ethernet
 
 
-class Hub(app_manager.RyuApp):
+class HubFlow(app_manager.RyuApp):
     OFP_VERSIONS = [ofproto_v1_3.OFP_VERSION]
 
     def __init__(self, *args, **kwargs):
-        super(Hub, self).__init__(*args, **kwargs)
+        super(HubFlow, self).__init__(*args, **kwargs)
 
     @set_ev_cls(ofp_event.EventOFPSwitchFeatures, CONFIG_DISPATCHER)
     def switch_features_handler(self, ev):
@@ -66,6 +66,10 @@ class Hub(app_manager.RyuApp):
 
         # construct action list.
         actions = [parser.OFPActionOutput(out_port)]
+
+        # install a flow
+        match = parser.OFPMatch()
+        self.add_flow(datapath, 1, match, actions)
 
         # construct packet_out message and send it.
         out = parser.OFPPacketOut(
