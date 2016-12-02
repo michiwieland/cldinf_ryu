@@ -76,7 +76,7 @@ class PolicyBasedController(app_manager.RyuApp):
         self.mac_to_port[dpid][src] = in_port
 
         # read policies from csv file
-        policies = CSVReader().read()
+        policies = CSVReader().policies
 
         if dst in policies[src]:
             actions = [parser.OFPActionOutput(out_port)]
