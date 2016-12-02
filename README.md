@@ -1,9 +1,7 @@
 # CldInf Prak Ryu
 
 # Installation
-1. [Download VM](sourceforge.net/projects/ryu/files/vmimages/OpenFlowTutorial/)
-2. Username: ryu / Password: ryu
-3. ssh ryu@[your vm]
+1. `make`
 
 ## Prerequisites
 1. `sudo apt-get update`
