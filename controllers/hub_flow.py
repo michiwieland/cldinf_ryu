@@ -59,7 +59,7 @@ class HubFlow(app_manager.RyuApp):
 
         # get the received port number from packet_in message.
         in_port = msg.match['in_port']
-        self.logger.info("packet in %s %s %s %s", dpid, src, dst, in_port)
+        self.logger.info("packet in %s %s", dpid, in_port)
 
         # flood on all ports
         out_port = ofproto.OFPP_FLOOD
